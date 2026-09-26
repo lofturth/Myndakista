@@ -1,9 +1,10 @@
 const translations = {
   is: {
-    subtitle: 'Myndablað → orðaforðamyndir', vocabulary: 'Orð og hugtök', hint: 'Settu eitt orð eða hugtak í hverja línu.',
+    generate: 'Semja fyrirmæli',
+    subtitle: 'Búðu til myndir fyrir orðalistann þinn með hjálp gervigreindar.', vocabulary: 'Orð og hugtök', hint: 'Settu eitt orð eða hugtak í hverja línu.',
     example: 'epli\nrautt reiðhjól\nfjall', parsed: 'Orð og hugtök úr listanum',
-    generate: 'Búa til fyrirmæli fyrir myndablað', prompt: 'Fyrirmæli fyrir myndablað',
-    promptHint: 'Sláðu inn orð eða hugtök og búðu svo til fyrirmæli.', copy: 'Afrita fyrirmæli',
+    prompt: 'Fyrirmæli fyrir myndablað',
+    handoff: 'Afritaðu fyrirmælin og límdu þau inn í ChatGPT, Gemini eða aðra myndagerðargervigreind. Búðu til myndina þar og afritaðu hana síðan aftur hingað.', promptHint: 'Sláðu inn orð eða hugtök til að sjá fyrirmælin.', copy: 'Afrita fyrirmæli',
     sheet: 'Myndablað', sheetHint: 'Límdu inn eða veldu myndablað sem passar nákvæmlega við reitaskiptinguna. Myndirnar haldast í þessum vafra. Ef orðalistanum er breytt er myndablaðið skorið aftur samkvæmt nýju reitaskiptingunni.',
     paste: 'Líma inn myndablað', pasteHint: 'Afritaðu myndina, smelltu hér og ýttu á ⌘V á Mac eða Ctrl+V á Windows. Þú getur líka límt mynd inn hvar sem er á síðunni.',
     alternative: 'Eða veldu myndaskrá', choose: 'Velja mynd', zoom: 'Aðdráttur', previews: 'Forskoðun orðaforðamynda', language: 'Tungumál',
@@ -29,9 +30,10 @@ ${concepts}
 ${unused > 0 ? `Fjöldi ónotaðra reita: ${unused}. Skildu alla ónotaða reiti eftir alveg auða og hvíta, á eftir síðasta hugtakinu í röðinni frá vinstri til hægri og ofan frá og niður. Haltu fullri stærð og lögun þeirra. Ekki endurtaka hugtök eða bæta við myndefni til uppfyllingar.` : 'Hverjum reit hefur verið úthlutað hugtaki; enginn reitur á að vera auður.'}`
   },
   en: {
-    subtitle: 'Contact sheet → vocabulary images', vocabulary: 'Vocabulary concepts', hint: 'Enter one item per line.',
+    generate: 'Generate prompt',
+    subtitle: 'Create images for your vocabulary list with the help of AI.', vocabulary: 'Vocabulary concepts', hint: 'Enter one item per line.',
     example: 'apple\nred bicycle\nmountain', parsed: 'Parsed vocabulary items',
-    generate: 'Generate contact-sheet prompt', prompt: 'Contact-sheet prompt', promptHint: 'Add vocabulary items, then generate a prompt.', copy: 'Copy prompt',
+    prompt: 'Contact-sheet prompt', handoff: 'Copy the prompt into ChatGPT, Gemini, or another image generator. Generate the image there, then copy the finished image back here.', promptHint: 'Add vocabulary items to see the prompt.', copy: 'Copy prompt',
     sheet: 'Contact-sheet image', sheetHint: 'Paste or choose a sheet matching the current grid exactly. Images stay in this browser. Editing vocabulary re-slices the sheet using the updated grid.',
     paste: 'Paste a contact-sheet image', pasteHint: 'Copy the image, click here, then press ⌘V on Mac or Ctrl+V on Windows. You can also paste an image anywhere on this page.',
     alternative: 'Or choose an image file', choose: 'Choose image', zoom: 'Zoom', previews: 'Vocabulary image previews', language: 'Language',
@@ -69,8 +71,19 @@ const vocabularyInput = document.querySelector('#vocabulary-input');
 const vocabularyList = document.querySelector('#vocabulary-list');
 const vocabularyCount = document.querySelector('#vocabulary-count');
 
-const gridSummary = document.querySelector('#grid-summary');
 const generateButton = document.querySelector('#generate-prompt');
+const promptStep = document.querySelector('#prompt-step');
+const imageStep = document.querySelector('#image-step');
+const resultsStep = document.querySelector('#results-step');
+
+function revealStep(section) {
+  if (!section.hidden) return;
+  section.hidden = false;
+  section.focus({ preventScroll: true });
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+const gridSummary = document.querySelector('#grid-summary');
 const promptOutput = document.querySelector('#prompt-output');
 const copyButton = document.querySelector('#copy-prompt');
 const copyStatus = document.querySelector('#copy-status');
@@ -91,7 +104,19 @@ function getGrid(count) {
   return { rows: Math.ceil(count / columns), columns };
 }
 
+function resizeVocabularyInput() {
+  // Re-measure wrapped lines after edits or viewport changes. Manual resizing
+  // remains available until the next content or viewport change.
+  vocabularyInput.style.height = 'auto';
+  const styles = getComputedStyle(vocabularyInput);
+  const borders = parseFloat(styles.borderTopWidth) + parseFloat(styles.borderBottomWidth);
+  vocabularyInput.style.height = `${Math.ceil(vocabularyInput.scrollHeight + borders)}px`;
+}
+
+window.addEventListener('resize', resizeVocabularyInput);
+
 function updateVocabulary() {
+  resizeVocabularyInput();
   items = vocabularyInput.value
     .split(/\r\n|\n|\r/)
     .map((line) => line.trim())
@@ -106,18 +131,20 @@ function updateVocabulary() {
   vocabularyList.replaceChildren(...listItems);
   updateVocabularySummary();
   generateButton.disabled = items.length === 0;
-  // Clear stale output so it always matches the current vocabulary.
-  promptOutput.value = '';
-  copyButton.disabled = true;
-  copyMessage = '';
-  copyStatus.textContent = '';
+  if (!promptStep.hidden) generatePrompt();
   renderSlices();
 }
 
 vocabularyInput.addEventListener('input', updateVocabulary);
 
 function generatePrompt() {
-  if (items.length === 0) return;
+  copyMessage = '';
+  copyStatus.textContent = '';
+  copyButton.disabled = items.length === 0;
+  if (items.length === 0) {
+    promptOutput.value = '';
+    return;
+  }
   const { rows, columns } = getGrid(items.length);
   const unused = rows * columns - items.length;
   const concepts = items.map((item, index) => {
@@ -127,10 +154,8 @@ function generatePrompt() {
   }).join('\n');
 
   promptOutput.value = t().promptText(rows, columns, concepts, unused);
-  copyButton.disabled = false;
-  copyMessage = '';
-  copyStatus.textContent = '';
 }
+
 
 async function copyPrompt() {
   const text = promptOutput.value;
@@ -140,6 +165,7 @@ async function copyPrompt() {
     if (promptOutput.value === text) {
       copyMessage = 'copied';
       copyStatus.textContent = t().copied;
+      revealStep(imageStep);
     }
   } catch {
     if (promptOutput.value !== text) return;
@@ -150,8 +176,25 @@ async function copyPrompt() {
   }
 }
 
-generateButton.addEventListener('click', generatePrompt);
+generateButton.addEventListener('click', () => {
+  if (!items.length) return;
+  generatePrompt();
+  revealStep(promptStep);
+});
+
 copyButton.addEventListener('click', copyPrompt);
+
+// Support the selected-text keyboard copy fallback when clipboard writing is unavailable.
+promptOutput.addEventListener('copy', (event) => {
+  if (!event.clipboardData || !promptOutput.value ||
+      promptOutput.selectionStart !== 0 ||
+      promptOutput.selectionEnd !== promptOutput.value.length) return;
+  event.clipboardData.setData('text/plain', promptOutput.value);
+  event.preventDefault();
+  copyMessage = 'copied';
+  copyStatus.textContent = t().copied;
+  revealStep(imageStep);
+});
 
 function renderSlices() {
   slicePreviews.replaceChildren();
@@ -232,6 +275,11 @@ async function loadSheet(file) {
   }
   sheetLoading = false;
   renderSlices();
+  if (sheetImage) {
+    // Also keep the input available when an image is pasted directly onto the page.
+    imageStep.hidden = false;
+    revealStep(resultsStep);
+  }
 }
 
 sheetInput.addEventListener('change', () => {
@@ -272,8 +320,9 @@ function updateVocabularySummary() {
 function applyLanguage() {
   document.documentElement.lang = language;
   const labels = {
-    'main > p': 'subtitle', '#vocabulary-label': 'vocabulary', '#vocabulary-hint': 'hint',
-    '#generate-prompt': 'generate', '#prompt-label': 'prompt', '#copy-prompt': 'copy',
+    '#app-subtitle': 'subtitle',
+    '#generate-prompt': 'generate', '#vocabulary-label': 'vocabulary', '#vocabulary-hint': 'hint',
+    '#prompt-handoff': 'handoff', '#prompt-label': 'prompt', '#copy-prompt': 'copy',
     '#sheet-label': 'sheet', '#sheet-hint': 'sheetHint', '#sheet-paste strong': 'paste',
     '#paste-hint': 'pasteHint', 'label[for="sheet-input"]:not(#sheet-label)': 'alternative',
     '#choose-sheet': 'choose', 'label[for="crop-inset"]': 'zoom'
