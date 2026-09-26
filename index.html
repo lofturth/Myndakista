@@ -17,49 +17,50 @@
     <p id="app-subtitle">Búðu til myndir fyrir orðalistann þinn með hjálp gervigreindar.</p>
     <div class="workflow-start">
       <button id="generate-prompt" type="button" disabled>Semja fyrirmæli</button>
-      <p id="grid-summary" hidden>Proposed grid: — (rows × columns)</p>
+      <p id="grid-summary" hidden>Tillaga að reitaskiptingu: — (raðir × dálkar)</p>
     </div>
     <section class="vocabulary" aria-labelledby="vocabulary-label">
       <div class="vocabulary-entry">
         <div class="vocabulary-entry-heading">
-          <label id="vocabulary-label" for="vocabulary-input">Vocabulary concepts</label>
-          <p id="vocabulary-hint">Enter one item per line.</p>
+          <label id="vocabulary-label" for="vocabulary-input">Orð og hugtök</label>
+          <p id="vocabulary-hint">Settu eitt orð eða hugtak í hverja línu.</p>
         </div>
-        <textarea id="vocabulary-input" rows="6" aria-describedby="vocabulary-hint" placeholder="apple&#10;red bicycle&#10;mountain"></textarea>
+        <textarea id="vocabulary-input" rows="6" aria-describedby="vocabulary-hint" placeholder="epli&#10;rautt reiðhjól&#10;fjall"></textarea>
       </div>
       <div class="vocabulary-results">
-        <p id="vocabulary-count" role="status" aria-live="polite" aria-atomic="true">0 vocabulary items</p>
-        <ol id="vocabulary-list" aria-label="Parsed vocabulary items"></ol>
+        <p id="vocabulary-count" role="status" aria-live="polite" aria-atomic="true">Fjöldi orða og hugtaka: 0</p>
+        <ol id="vocabulary-list" aria-label="Orð og hugtök úr listanum"></ol>
       </div>
     </section>
     <section id="prompt-step" class="prompt-section" aria-labelledby="prompt-label" tabindex="-1" hidden>
-      <label id="prompt-label" for="prompt-output">Contact-sheet prompt</label>
+      <label id="prompt-label" for="prompt-output">Fyrirmæli fyrir myndablað</label>
       <div class="prompt-handoff-row">
         <p id="prompt-handoff">Afritaðu fyrirmælin og límdu þau inn í ChatGPT, Gemini eða aðra myndagerðargervigreind. Búðu til myndina þar og afritaðu hana síðan aftur hingað.</p>
-        <button id="copy-prompt" type="button" disabled>Copy prompt</button>
+        <button id="copy-prompt" type="button" disabled>Afrita fyrirmæli</button>
       </div>
       <textarea id="prompt-output" rows="12" readonly aria-describedby="prompt-handoff" placeholder="Sláðu inn orð eða hugtök til að sjá fyrirmælin."></textarea>
       <p id="copy-status" role="status" aria-live="polite"></p>
     </section>
     <section id="image-step" class="slicing-section" aria-labelledby="sheet-label" tabindex="-1" hidden>
-      <label id="sheet-label" for="sheet-input">Contact-sheet image</label>
-      <p id="sheet-hint">Paste or choose a sheet matching the current grid exactly. Images stay in this browser. Editing vocabulary re-slices the sheet using the updated grid.</p>
-      <div id="sheet-paste" tabindex="0" role="group" aria-label="Paste a contact-sheet image" aria-describedby="paste-hint">
-        <strong>Paste a contact-sheet image</strong>
-        <p id="paste-hint">Copy the image, click here, then press ⌘V on Mac or Ctrl+V on Windows. You can also paste an image anywhere on this page.</p>
+      <label id="sheet-label" for="sheet-input">Myndablað</label>
+      <p id="sheet-hint">Límdu inn eða veldu myndablað sem passar nákvæmlega við reitaskiptinguna. Myndirnar haldast í þessum vafra. Ef orðalistanum er breytt er myndablaðið skorið aftur samkvæmt nýju reitaskiptingunni.</p>
+      <div id="sheet-paste" tabindex="0" role="group" aria-label="Líma inn myndablað" aria-describedby="paste-hint">
+        <strong>Líma inn myndablað</strong>
+        <p id="paste-hint">Afritaðu myndina, smelltu hér og ýttu á ⌘V á Mac eða Ctrl+V á Windows. Þú getur líka límt mynd inn hvar sem er á síðunni.</p>
       </div>
-      <label for="sheet-input">Or choose an image file</label>
+      <label for="sheet-input">Eða veldu myndaskrá</label>
       <button id="choose-sheet" type="button">Velja mynd</button>
       <input hidden id="sheet-input" type="file" accept="image/*" aria-describedby="sheet-hint">
-      <p id="slice-status" role="status" aria-live="polite">Add vocabulary items and paste or choose an image to preview slices.</p>
+      <p id="slice-status" role="status" aria-live="polite">Sláðu inn orð eða hugtök og límdu inn eða veldu mynd til að forskoða myndskurðinn.</p>
     </section>
     <section id="results-step" class="results-section" aria-labelledby="zoom-label" tabindex="-1" hidden>
       <div class="crop-inset-control">
-        <label id="zoom-label" for="crop-inset">Zoom</label>
+        <label id="zoom-label" for="crop-inset">Aðdráttur</label>
         <input id="crop-inset" type="range" min="0" max="20" step="0.1" value="0" aria-valuetext="0%">
         <output id="crop-inset-value" for="crop-inset">0%</output>
       </div>
-      <ol id="slice-previews" aria-label="Vocabulary image previews"></ol>
+      <p id="click-hint" class="hint">Smelltu á mynd til að afrita hana á klippispjald.</p>
+      <ol id="slice-previews" aria-label="Forskoðun orðaforðamynda"></ol>
     </section>
   </main>
 </body>
