@@ -16,9 +16,6 @@ const translations = {
     readError: 'Ekki tókst að lesa myndina. Veldu mynd á studdu sniði, til dæmis PNG eða JPEG.',
     sliceError: 'Ekki tókst að skera myndina. Prófaðu minni mynd eða annað snið.',
     cropLabel: item => `Útskorin mynd fyrir ${item}`,
-    clickToCopy: 'Smelltu til að afrita mynd',
-    imageCopied: 'Mynd afrituð!',
-    imageCopyError: 'Ekki tókst að afrita mynd.',
     sliceSummary: (n, rows, columns, unused) => `Forskoðun: ${n} myndir · ${rows} × ${columns} reitir (raðir × dálkar)` + (unused ? ` · Auðir reitir sem sleppt er: ${unused}.` : '.'),
     cell: (i, row, column, item) => `${i}. Röð ${row}, dálkur ${column}: ${JSON.stringify(item)}`,
     promptText: (rows, columns, concepts, unused) => `Búðu til eitt myndablað með nákvæmlega ${rows} röðum og ${columns} dálkum (alls ${rows * columns} reitir).
@@ -46,9 +43,6 @@ ${unused > 0 ? `Fjöldi ónotaðra reita: ${unused}. Skildu alla ónotaða reiti
     loading: 'Loading image…', ready: 'Image ready. Add vocabulary items to preview slices.', empty: 'Add vocabulary items and paste or choose an image to preview slices.',
     readError: 'Could not read this image. Choose a supported image such as PNG or JPEG.', sliceError: 'Could not slice this image. Try a smaller image or another format.',
     cropLabel: item => `Cropped image for ${item}`,
-    clickToCopy: 'Click to copy image',
-    imageCopied: 'Image copied!',
-    imageCopyError: 'Failed to copy image.',
     sliceSummary: (n, rows, columns, unused) => `${n} previews · ${rows} × ${columns} grid (rows × columns)` + (unused ? ` · ${unused} unused ${unused === 1 ? 'cell' : 'cells'} ignored.` : '.'),
     cell: (i, row, column, item) => `${i}. Row ${row}, column ${column}: ${JSON.stringify(item)}`,
     promptText: (rows, columns, concepts, unused) => `Create a single contact-sheet image containing exactly ${rows} rows and ${columns} columns (${rows * columns} cells total).
@@ -61,7 +55,7 @@ Concepts in cell order:
 ${concepts}
 
 ${unused > 0
-    ? `Leave the final ${unused} unused${unused === 1 ? 'cell' : 'cells'} completely blank white, after the last concept in left-to-right, top-to-bottom order. Preserve their full cell geometry. Do not repeat concepts or invent fillers.`
+    ? `Leave the final ${unused} unused ${unused === 1 ? 'cell' : 'cells'} completely blank white, after the last concept in left-to-right, top-to-bottom order. Preserve their full cell geometry. Do not repeat concepts or invent fillers.`
     : 'Every cell is assigned a concept; leave no unused cells.'}`
   }
 };
@@ -111,6 +105,8 @@ function getGrid(count) {
 }
 
 function resizeVocabularyInput() {
+  // Re-measure wrapped lines after edits or viewport changes. Manual resizing
+  // remains available until the next content or viewport change.
   vocabularyInput.style.height = 'auto';
   const styles = getComputedStyle(vocabularyInput);
   const borders = parseFloat(styles.borderTopWidth) + parseFloat(styles.borderBottomWidth);
@@ -160,6 +156,7 @@ function generatePrompt() {
   promptOutput.value = t().promptText(rows, columns, concepts, unused);
 }
 
+
 async function copyPrompt() {
   const text = promptOutput.value;
   if (!text) return;
@@ -187,6 +184,7 @@ generateButton.addEventListener('click', () => {
 
 copyButton.addEventListener('click', copyPrompt);
 
+// Support the selected-text keyboard copy fallback when clipboard writing is unavailable.
 promptOutput.addEventListener('copy', (event) => {
   if (!event.clipboardData || !promptOutput.value ||
       promptOutput.selectionStart !== 0 ||
@@ -197,23 +195,6 @@ promptOutput.addEventListener('copy', (event) => {
   copyStatus.textContent = t().copied;
   revealStep(imageStep);
 });
-
-async function copyCanvasToClipboard(canvas, labelElement, defaultLabel) {
-  try {
-    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
-    if (!blob) throw new Error('Blob creation failed');
-    await navigator.clipboard.write([
-      new ClipboardItem({ 'image/png': blob })
-    ]);
-    labelElement.textContent = `✓ ${t().imageCopied}`;
-  } catch (err) {
-    labelElement.textContent = `✕ ${t().imageCopyError}`;
-  } finally {
-    setTimeout(() => {
-      labelElement.textContent = defaultLabel;
-    }, 2000);
-  }
-}
 
 function renderSlices() {
   slicePreviews.replaceChildren();
@@ -249,7 +230,7 @@ function renderSlices() {
       canvas.setAttribute('aria-label', t().cropLabel(item));
       const context = canvas.getContext('2d');
       if (!context) throw new Error('Canvas unavailable');
-      
+      // Apply the same percentage to each side of its cell dimension.
       context.drawImage(
         sheetImage,
         (index % columns) * cellWidth + insetX,
@@ -257,28 +238,9 @@ function renderSlices() {
         cellWidth - 2 * insetX, cellHeight - 2 * insetY,
         0, 0, canvas.width, canvas.height
       );
-
       const preview = document.createElement('li');
       const label = document.createElement('span');
-      const defaultText = `${index + 1}. ${item}`;
-      label.textContent = defaultText;
-
-      // Styling & accessibility setup to make the slice clickable and clear
-      preview.style.cursor = 'pointer';
-      preview.setAttribute('tabindex', '0');
-      preview.setAttribute('role', 'button');
-      preview.title = t().clickToCopy;
-
-      const triggerCopy = () => copyCanvasToClipboard(canvas, label, defaultText);
-
-      preview.addEventListener('click', triggerCopy);
-      preview.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          triggerCopy();
-        }
-      });
-
+      label.textContent = `${index + 1}. ${item}`;
       preview.append(canvas, label);
       previews.append(preview);
     });
@@ -300,6 +262,7 @@ async function loadSheet(file) {
   if (!file) return;
 
   try {
+    // Decode the local file directly; no network request or stored copy is needed.
     const image = await createImageBitmap(file);
     if (selection !== imageSelection) {
       image.close();
@@ -313,6 +276,7 @@ async function loadSheet(file) {
   sheetLoading = false;
   renderSlices();
   if (sheetImage) {
+    // Also keep the input available when an image is pasted directly onto the page.
     imageStep.hidden = false;
     revealStep(resultsStep);
   }
@@ -334,6 +298,7 @@ document.addEventListener('paste', (event) => {
   const file = imageItem?.getAsFile();
   if (!file) return;
 
+  // Leave ordinary text pastes untouched; images use the file picker's path.
   event.preventDefault();
   sheetInput.value = '';
   loadSheet(file);
