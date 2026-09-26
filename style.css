@@ -1,0 +1,73 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #fafafa;
+  color: #202124;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+main {
+  width: min(100%, 960px);
+  margin: 0 auto;
+  padding: 64px 24px;
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+p {
+  margin: 0;
+  color: #62666d;
+  font-size: 1.125rem;
+}
+
+.vocabulary {
+  max-width: 600px;
+  margin-top: 28px;
+}
+
+.vocabulary label {
+  display: block;
+  font-weight: 600;
+}
+
+.vocabulary p {
+  font-size: 0.875rem;
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  margin: 8px 0 12px;
+  padding: 12px;
+  border: 1px solid #c8cbd0;
+  border-radius: 6px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  resize: vertical;
+}
+
+textarea:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+#vocabulary-list {
+  margin: 8px 0 0;
+  padding-left: 28px;
+  overflow-wrap: anywhere;
+}
+
+#vocabulary-list:empty {
+  display: none;
+}

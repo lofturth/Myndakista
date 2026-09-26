@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Sheet Prototype</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main>
+    <h1>Image Sheet Prototype</h1>
+    <p>Contact sheet → vocabulary images</p>
+    <section class="vocabulary" aria-labelledby="vocabulary-label">
+      <label id="vocabulary-label" for="vocabulary-input">Vocabulary concepts</label>
+      <p id="vocabulary-hint">Enter one item per line.</p>
+      <textarea id="vocabulary-input" rows="6" aria-describedby="vocabulary-hint" placeholder="apple&#10;red bicycle&#10;mountain"></textarea>
+      <p id="vocabulary-count" role="status" aria-live="polite" aria-atomic="true">0 vocabulary items</p>
+      <ol id="vocabulary-list" aria-label="Parsed vocabulary items"></ol>
+    </section>
+  </main>
+</body>
+</html>
