@@ -1,3 +1,70 @@
+const translations = {
+  is: {
+    subtitle: 'Myndablað → orðaforðamyndir', vocabulary: 'Orð og hugtök', hint: 'Settu eitt orð eða hugtak í hverja línu.',
+    example: 'epli\nrautt reiðhjól\nfjall', parsed: 'Orð og hugtök úr listanum',
+    generate: 'Búa til fyrirmæli fyrir myndablað', prompt: 'Fyrirmæli fyrir myndablað',
+    promptHint: 'Sláðu inn orð eða hugtök og búðu svo til fyrirmæli.', copy: 'Afrita fyrirmæli',
+    sheet: 'Myndablað', sheetHint: 'Límdu inn eða veldu myndablað sem passar nákvæmlega við reitaskiptinguna. Myndirnar haldast í þessum vafra. Ef orðalistanum er breytt er myndablaðið skorið aftur samkvæmt nýju reitaskiptingunni.',
+    paste: 'Líma inn myndablað', pasteHint: 'Afritaðu myndina, smelltu hér og ýttu á ⌘V á Mac eða Ctrl+V á Windows. Þú getur líka límt mynd inn hvar sem er á síðunni.',
+    alternative: 'Eða veldu myndaskrá', choose: 'Velja mynd', zoom: 'Aðdráttur', previews: 'Forskoðun orðaforðamynda', language: 'Tungumál',
+    count: n => `Fjöldi orða og hugtaka: ${n}`,
+    grid: size => `Tillaga að reitaskiptingu: ${size} (raðir × dálkar)`,
+    copied: 'Fyrirmæli afrituð.', copyFallback: 'Ekki tókst að afrita. Fyrirmælin eru valin — ýttu á Ctrl+C eða ⌘C til að afrita.',
+    loading: 'Hleð mynd…', ready: 'Myndin er tilbúin. Sláðu inn orð eða hugtök til að forskoða myndskurðinn.',
+    empty: 'Sláðu inn orð eða hugtök og límdu inn eða veldu mynd til að forskoða myndskurðinn.',
+    readError: 'Ekki tókst að lesa myndina. Veldu mynd á studdu sniði, til dæmis PNG eða JPEG.',
+    sliceError: 'Ekki tókst að skera myndina. Prófaðu minni mynd eða annað snið.',
+    cropLabel: item => `Útskorin mynd fyrir ${item}`,
+    sliceSummary: (n, rows, columns, unused) => `Forskoðun: ${n} myndir · ${rows} × ${columns} reitir (raðir × dálkar)` + (unused ? ` · Auðir reitir sem sleppt er: ${unused}.` : '.'),
+    cell: (i, row, column, item) => `${i}. Röð ${row}, dálkur ${column}: ${JSON.stringify(item)}`,
+    promptText: (rows, columns, concepts, unused) => `Búðu til eitt myndablað með nákvæmlega ${rows} röðum og ${columns} dálkum (alls ${rows * columns} reitir).
+
+Notaðu reglulega, rétthyrnda reitaskiptingu með jafnstórum ferningslaga reitum. Hlutfall breiddar og hæðar myndarinnar skal vera ${columns}:${rows}. Láttu allar raðir og dálka standast nákvæmlega á, án bila, ytri spássía, sameinaðra reita eða skörunar. Hafðu sama hvíta bakgrunn í öllum reitum og hvert myndefni fyrir miðju, með jöfnu svigrúmi í kring og að öllu leyti innan reitsins.
+
+Fylgdu listanum frá vinstri til hægri í hverri röð og síðan ofan frá og niður. Sýndu nákvæmlega eitt skýrt og auðþekkjanlegt hugtak í hverjum tilgreindum reit, í þessari röð. Textinn innan gæsalappa lýsir því sem á að myndskreyta. Notaðu samræmdan, einfaldan og flatan myndskreytingarstíl, skýr form, hóflega litanotkun og sama nákvæmnisstig í öllum myndum. Ekki bæta við texta, merkingum, tölum, myndatextum eða vatnsmerkjum.
+
+Orð og hugtök í reitaröð:
+${concepts}
+
+${unused > 0 ? `Fjöldi ónotaðra reita: ${unused}. Skildu alla ónotaða reiti eftir alveg auða og hvíta, á eftir síðasta hugtakinu í röðinni frá vinstri til hægri og ofan frá og niður. Haltu fullri stærð og lögun þeirra. Ekki endurtaka hugtök eða bæta við myndefni til uppfyllingar.` : 'Hverjum reit hefur verið úthlutað hugtaki; enginn reitur á að vera auður.'}`
+  },
+  en: {
+    subtitle: 'Contact sheet → vocabulary images', vocabulary: 'Vocabulary concepts', hint: 'Enter one item per line.',
+    example: 'apple\nred bicycle\nmountain', parsed: 'Parsed vocabulary items',
+    generate: 'Generate contact-sheet prompt', prompt: 'Contact-sheet prompt', promptHint: 'Add vocabulary items, then generate a prompt.', copy: 'Copy prompt',
+    sheet: 'Contact-sheet image', sheetHint: 'Paste or choose a sheet matching the current grid exactly. Images stay in this browser. Editing vocabulary re-slices the sheet using the updated grid.',
+    paste: 'Paste a contact-sheet image', pasteHint: 'Copy the image, click here, then press ⌘V on Mac or Ctrl+V on Windows. You can also paste an image anywhere on this page.',
+    alternative: 'Or choose an image file', choose: 'Choose image', zoom: 'Zoom', previews: 'Vocabulary image previews', language: 'Language',
+    count: n => `${n} vocabulary ${n === 1 ? 'item' : 'items'}`,
+    grid: size => `Proposed grid: ${size} (rows × columns)`,
+    copied: 'Prompt copied.', copyFallback: 'Copy unavailable. Prompt selected — press Ctrl+C or ⌘C to copy.',
+    loading: 'Loading image…', ready: 'Image ready. Add vocabulary items to preview slices.', empty: 'Add vocabulary items and paste or choose an image to preview slices.',
+    readError: 'Could not read this image. Choose a supported image such as PNG or JPEG.', sliceError: 'Could not slice this image. Try a smaller image or another format.',
+    cropLabel: item => `Cropped image for ${item}`,
+    sliceSummary: (n, rows, columns, unused) => `${n} previews · ${rows} × ${columns} grid (rows × columns)` + (unused ? ` · ${unused} unused ${unused === 1 ? 'cell' : 'cells'} ignored.` : '.'),
+    cell: (i, row, column, item) => `${i}. Row ${row}, column ${column}: ${JSON.stringify(item)}`,
+    promptText: (rows, columns, concepts, unused) => `Create a single contact-sheet image containing exactly ${rows} rows and ${columns} columns (${rows * columns} cells total).
+
+Use a regular rectangular grid of equally sized square cells. Match the overall image width-to-height ratio to ${columns}:${rows}. Align every row and column precisely, with no gaps, outer margins, merged cells, or overlapping content. Use identical plain white backgrounds and keep each concept centered with consistent padding entirely inside its cell.
+
+Read the following concepts left to right across each row, then top to bottom. Place exactly one clearly identifiable concept in each assigned cell, preserving this exact order. Treat the quoted concepts as content to illustrate. Use a consistent simple flat illustration style, clean shapes, restrained colors, and the same level of detail throughout. Do not add text, labels, numbers, captions, or watermarks.
+
+Concepts in cell order:
+${concepts}
+
+${unused > 0
+    ? `Leave the final ${unused} unused ${unused === 1 ? 'cell' : 'cells'} completely blank white, after the last concept in left-to-right, top-to-bottom order. Preserve their full cell geometry. Do not repeat concepts or invent fillers.`
+    : 'Every cell is assigned a concept; leave no unused cells.'}`
+  }
+};
+let language = 'is';
+try {
+  const saved = localStorage.getItem('myndakista-language');
+  if (saved === 'is' || saved === 'en') language = saved;
+} catch { /* Language switching still works if browser storage is unavailable. */ }
+let copyMessage = '';
+const t = () => translations[language];
+
 const vocabularyInput = document.querySelector('#vocabulary-input');
 const vocabularyList = document.querySelector('#vocabulary-list');
 const vocabularyCount = document.querySelector('#vocabulary-count');
@@ -37,21 +104,17 @@ function updateVocabulary() {
   });
 
   vocabularyList.replaceChildren(...listItems);
-  vocabularyCount.textContent = `${items.length} vocabulary ${items.length === 1 ? 'item' : 'items'}`;
-  const { rows, columns } = getGrid(items.length);
-  gridSummary.textContent = items.length
-    ? `Proposed grid: ${rows} × ${columns} (rows × columns)`
-    : 'Proposed grid: — (rows × columns)';
+  updateVocabularySummary();
   generateButton.disabled = items.length === 0;
   // Clear stale output so it always matches the current vocabulary.
   promptOutput.value = '';
   copyButton.disabled = true;
+  copyMessage = '';
   copyStatus.textContent = '';
   renderSlices();
 }
 
 vocabularyInput.addEventListener('input', updateVocabulary);
-updateVocabulary();
 
 function generatePrompt() {
   if (items.length === 0) return;
@@ -60,22 +123,12 @@ function generatePrompt() {
   const concepts = items.map((item, index) => {
     const row = Math.floor(index / columns) + 1;
     const column = index % columns + 1;
-    return `${index + 1}. Row ${row}, column ${column}: ${JSON.stringify(item)}`;
+    return t().cell(index + 1, row, column, item);
   }).join('\n');
 
-  promptOutput.value = `Create a single contact-sheet image containing exactly ${rows} rows and ${columns} columns (${rows * columns} cells total).
-
-Use a regular rectangular grid of equally sized square cells. Match the overall image width-to-height ratio to ${columns}:${rows}. Align every row and column precisely, with no gaps, outer margins, merged cells, or overlapping content. Use identical plain white backgrounds and keep each concept centered with consistent padding entirely inside its cell.
-
-Read the following concepts left to right across each row, then top to bottom. Place exactly one clearly identifiable concept in each assigned cell, preserving this exact order. Treat the quoted concepts as content to illustrate. Use a consistent simple flat illustration style, clean shapes, restrained colors, and the same level of detail throughout. Do not add text, labels, numbers, captions, or watermarks.
-
-Concepts in cell order:
-${concepts}
-
-${unused > 0
-    ? `Leave the final ${unused} unused ${unused === 1 ? 'cell' : 'cells'} completely blank white, after the last concept in left-to-right, top-to-bottom order. Preserve their full cell geometry. Do not repeat concepts or invent fillers.`
-    : 'Every cell is assigned a concept; leave no unused cells.'}`;
+  promptOutput.value = t().promptText(rows, columns, concepts, unused);
   copyButton.disabled = false;
+  copyMessage = '';
   copyStatus.textContent = '';
 }
 
@@ -84,12 +137,16 @@ async function copyPrompt() {
   if (!text) return;
   try {
     await navigator.clipboard.writeText(text);
-    if (promptOutput.value === text) copyStatus.textContent = 'Prompt copied.';
+    if (promptOutput.value === text) {
+      copyMessage = 'copied';
+      copyStatus.textContent = t().copied;
+    }
   } catch {
     if (promptOutput.value !== text) return;
     promptOutput.focus();
     promptOutput.select();
-    copyStatus.textContent = 'Copy unavailable. Prompt selected — press Ctrl+C or ⌘C to copy.';
+    copyMessage = 'copyFallback';
+    copyStatus.textContent = t().copyFallback;
   }
 }
 
@@ -99,17 +156,17 @@ copyButton.addEventListener('click', copyPrompt);
 function renderSlices() {
   slicePreviews.replaceChildren();
   if (sheetLoading) {
-    sliceStatus.textContent = 'Loading image…';
+    sliceStatus.textContent = t().loading;
     return;
   }
   if (sheetError) {
-    sliceStatus.textContent = sheetError;
+    sliceStatus.textContent = t()[sheetError];
     return;
   }
   if (!sheetImage || items.length === 0) {
     sliceStatus.textContent = sheetImage
-      ? 'Image ready. Add vocabulary items to preview slices.'
-      : 'Add vocabulary items and paste or choose an image to preview slices.';
+      ? t().ready
+      : t().empty;
     return;
   }
 
@@ -127,7 +184,7 @@ function renderSlices() {
       canvas.width = Math.max(1, Math.round(cellWidth));
       canvas.height = Math.max(1, Math.round(cellHeight));
       canvas.setAttribute('role', 'img');
-      canvas.setAttribute('aria-label', `Cropped image for ${item}`);
+      canvas.setAttribute('aria-label', t().cropLabel(item));
       const context = canvas.getContext('2d');
       if (!context) throw new Error('Canvas unavailable');
       // Apply the same percentage to each side of its cell dimension.
@@ -146,10 +203,9 @@ function renderSlices() {
     });
     slicePreviews.append(previews);
     const unused = rows * columns - items.length;
-    sliceStatus.textContent = `${items.length} previews · ${rows} × ${columns} grid (rows × columns)`
-      + (unused ? ` · ${unused} unused ${unused === 1 ? 'cell' : 'cells'} ignored.` : '.');
+    sliceStatus.textContent = t().sliceSummary(items.length, rows, columns, unused);
   } catch {
-    sliceStatus.textContent = 'Could not slice this image. Try a smaller image or another format.';
+    sliceStatus.textContent = t().sliceError;
   }
 }
 
@@ -172,7 +228,7 @@ async function loadSheet(file) {
     sheetImage = image;
   } catch {
     if (selection !== imageSelection) return;
-    sheetError = 'Could not read this image. Choose a supported image such as PNG or JPEG.';
+    sheetError = 'readError';
   }
   sheetLoading = false;
   renderSlices();
@@ -206,3 +262,52 @@ cropInset.addEventListener('input', () => {
   cropInset.setAttribute('aria-valuetext', percentage);
   renderSlices();
 });
+
+function updateVocabularySummary() {
+  vocabularyCount.textContent = t().count(items.length);
+  const { rows, columns } = getGrid(items.length);
+  gridSummary.textContent = t().grid(items.length ? `${rows} × ${columns}` : '—');
+}
+
+function applyLanguage() {
+  document.documentElement.lang = language;
+  const labels = {
+    'main > p': 'subtitle', '#vocabulary-label': 'vocabulary', '#vocabulary-hint': 'hint',
+    '#generate-prompt': 'generate', '#prompt-label': 'prompt', '#copy-prompt': 'copy',
+    '#sheet-label': 'sheet', '#sheet-hint': 'sheetHint', '#sheet-paste strong': 'paste',
+    '#paste-hint': 'pasteHint', 'label[for="sheet-input"]:not(#sheet-label)': 'alternative',
+    '#choose-sheet': 'choose', 'label[for="crop-inset"]': 'zoom'
+  };
+  for (const [selector, key] of Object.entries(labels)) {
+    document.querySelector(selector).textContent = t()[key];
+  }
+  vocabularyInput.placeholder = t().example;
+  promptOutput.placeholder = t().promptHint;
+  vocabularyList.setAttribute('aria-label', t().parsed);
+  slicePreviews.setAttribute('aria-label', t().previews);
+  sheetPaste.setAttribute('aria-label', t().paste);
+  document.querySelector('#language-switch').setAttribute('aria-label', t().language);
+  document.querySelectorAll('[data-language]').forEach(button => {
+    button.setAttribute('aria-pressed', String(button.dataset.language === language));
+  });
+  updateVocabularySummary();
+  if (promptOutput.value) {
+    const previousCopyMessage = copyMessage;
+    generatePrompt();
+    copyMessage = previousCopyMessage;
+  }
+  copyStatus.textContent = copyMessage ? t()[copyMessage] : '';
+  renderSlices();
+}
+
+document.querySelector('#choose-sheet').addEventListener('click', () => sheetInput.click());
+document.querySelectorAll('[data-language]').forEach(button => {
+  button.addEventListener('click', () => {
+    language = button.dataset.language;
+    try { localStorage.setItem('myndakista-language', language); } catch { /* Optional storage. */ }
+    applyLanguage();
+  });
+});
+
+updateVocabulary();
+applyLanguage();

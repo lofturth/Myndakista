@@ -1,15 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="is">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Sheet Prototype</title>
+  <title>Myndakista</title>
   <link rel="stylesheet" href="style.css">
   <script src="app.js" defer></script>
 </head>
 <body>
   <main>
-    <h1>Image Sheet Prototype</h1>
+    <h1>Myndakista</h1>
+    <div id="language-switch" role="group" aria-label="Tungumál">
+      <button type="button" data-language="is" lang="is" aria-label="Íslenska" title="Íslenska" aria-pressed="true"><span aria-hidden="true">🇮🇸</span></button>
+      <button type="button" data-language="en" lang="en" aria-label="English" title="English" aria-pressed="false"><span aria-hidden="true">🇬🇧</span></button>
+    </div>
     <p>Contact sheet → vocabulary images</p>
     <section class="vocabulary" aria-labelledby="vocabulary-label">
       <label id="vocabulary-label" for="vocabulary-input">Vocabulary concepts</label>
@@ -34,7 +38,8 @@
         <p id="paste-hint">Copy the image, click here, then press ⌘V on Mac or Ctrl+V on Windows. You can also paste an image anywhere on this page.</p>
       </div>
       <label for="sheet-input">Or choose an image file</label>
-      <input id="sheet-input" type="file" accept="image/*" aria-describedby="sheet-hint">
+      <button id="choose-sheet" type="button">Velja mynd</button>
+      <input hidden id="sheet-input" type="file" accept="image/*" aria-describedby="sheet-hint">
       <p id="slice-status" role="status" aria-live="polite">Add vocabulary items and paste or choose an image to preview slices.</p>
       <div class="crop-inset-control">
         <label for="crop-inset">Zoom</label>

@@ -213,3 +213,30 @@ button:disabled {
   min-width: 3.5ch;
   font-variant-numeric: tabular-nums;
 }
+
+#language-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+#language-switch button {
+  padding: 4px 8px;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+#language-switch button[aria-pressed="true"] {
+  border-color: #7a8596;
+  font-weight: 600;
+  background: #eef1f5;
+}
+
+#sheet-input[hidden] {
+  display: none;
+}
+
+#choose-sheet {
+  margin: 10px 0;
+}
