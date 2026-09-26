@@ -26,6 +26,18 @@
       <button id="copy-prompt" type="button" disabled>Copy prompt</button>
       <p id="copy-status" role="status" aria-live="polite"></p>
     </section>
+    <section class="slicing-section" aria-labelledby="sheet-label">
+      <label id="sheet-label" for="sheet-input">Contact-sheet image</label>
+      <p id="sheet-hint">Paste or choose a sheet matching the current grid exactly. Images stay in this browser. Editing vocabulary re-slices the sheet using the updated grid.</p>
+      <div id="sheet-paste" tabindex="0" role="group" aria-label="Paste a contact-sheet image" aria-describedby="paste-hint">
+        <strong>Paste a contact-sheet image</strong>
+        <p id="paste-hint">Copy the image, click here, then press ⌘V on Mac or Ctrl+V on Windows. You can also paste an image anywhere on this page.</p>
+      </div>
+      <label for="sheet-input">Or choose an image file</label>
+      <input id="sheet-input" type="file" accept="image/*" aria-describedby="sheet-hint">
+      <p id="slice-status" role="status" aria-live="polite">Add vocabulary items and paste or choose an image to preview slices.</p>
+      <ol id="slice-previews" aria-label="Vocabulary image previews"></ol>
+    </section>
   </main>
 </body>
 </html>

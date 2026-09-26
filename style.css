@@ -123,3 +123,73 @@ button:disabled {
 #copy-status {
   margin-top: 6px;
 }
+
+.slicing-section {
+  max-width: 600px;
+  margin-top: 24px;
+}
+
+.slicing-section label {
+  display: block;
+  font-weight: 600;
+}
+
+.slicing-section p {
+  font-size: 0.875rem;
+}
+
+#sheet-input {
+  display: block;
+  max-width: 100%;
+  margin: 10px 0;
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+#slice-previews {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+#slice-previews:empty {
+  display: none;
+}
+
+#slice-previews li {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.875rem;
+}
+
+#slice-previews canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 4px;
+  border: 1px solid #c8cbd0;
+  border-radius: 4px;
+}
+
+#sheet-paste {
+  margin: 12px 0;
+  padding: 16px;
+  border: 2px dashed #aab3c0;
+  border-radius: 6px;
+  background: #fff;
+  cursor: text;
+}
+
+#sheet-paste strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+#sheet-paste:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+  border-color: #2563eb;
+}
