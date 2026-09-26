@@ -18,6 +18,14 @@
       <p id="vocabulary-count" role="status" aria-live="polite" aria-atomic="true">0 vocabulary items</p>
       <ol id="vocabulary-list" aria-label="Parsed vocabulary items"></ol>
     </section>
+    <section class="prompt-section" aria-labelledby="prompt-label">
+      <p id="grid-summary" role="status">Proposed grid: — (rows × columns)</p>
+      <button id="generate-prompt" type="button" disabled>Generate contact-sheet prompt</button>
+      <label id="prompt-label" for="prompt-output">Contact-sheet prompt</label>
+      <textarea id="prompt-output" rows="12" readonly placeholder="Add vocabulary items, then generate a prompt."></textarea>
+      <button id="copy-prompt" type="button" disabled>Copy prompt</button>
+      <p id="copy-status" role="status" aria-live="polite"></p>
+    </section>
   </main>
 </body>
 </html>

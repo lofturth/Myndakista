@@ -71,3 +71,55 @@ textarea:focus-visible {
 #vocabulary-list:empty {
   display: none;
 }
+
+.prompt-section {
+  max-width: 600px;
+  margin-top: 24px;
+}
+
+.prompt-section label {
+  display: block;
+  margin-top: 16px;
+  font-weight: 600;
+}
+
+.prompt-section p {
+  font-size: 0.875rem;
+}
+
+button {
+  padding: 8px 12px;
+  border: 1px solid #c8cbd0;
+  border-radius: 6px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: #eef1f5;
+}
+
+button:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+#generate-prompt {
+  margin-top: 8px;
+}
+
+#prompt-output {
+  font-size: 0.875rem;
+}
+
+#copy-status {
+  margin-top: 6px;
+}
