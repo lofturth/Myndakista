@@ -1,23 +1,39 @@
 const translations = {
   is: {
     generate: 'Semja fyrirmæli',
-    subtitle: 'Búðu til myndir fyrir orðalistann þinn með hjálp gervigreindar.', vocabulary: 'Orð og hugtök', hint: 'Settu eitt orð eða hugtak í hverja línu.',
-    example: 'epli\nrautt reiðhjól\nfjall', parsed: 'Orð og hugtök úr listanum',
+    subtitle: 'Búðu til myndir fyrir orðalistann þinn með hjálp gervigreindar.',
+    vocabulary: 'Orð og hugtök',
+    hint: 'Settu eitt orð eða hugtak í hverja línu.',
+    example: 'epli\nrautt reiðhjól\nfjall',
+    parsed: 'Orð og hugtök úr listanum',
     prompt: 'Fyrirmæli fyrir myndablað',
-    handoff: 'Afritaðu fyrirmælin og límdu þau inn í ChatGPT, Gemini eða aðra myndagerðargervigreind. Búðu til myndina þar og afritaðu hana síðan aftur hingað.', promptHint: 'Sláðu inn orð eða hugtök til að sjá fyrirmælin.', copy: 'Afrita fyrirmæli',
-    sheet: 'Myndablað', sheetHint: 'Límdu inn eða veldu myndablað sem passar nákvæmlega við reitaskiptinguna. Myndirnar haldast í þessum vafra. Ef orðalistanum er breytt er myndablaðið skorið aftur samkvæmt nýju reitaskiptingunni.',
-    paste: 'Líma inn myndablað', pasteHint: 'Afritaðu myndina, smelltu hér og ýttu á ⌘V á Mac eða Ctrl+V á Windows. Þú getur líka límt mynd inn hvar sem er á síðunni.',
-    alternative: 'Eða veldu myndaskrá', choose: 'Velja mynd', zoom: 'Aðdráttur', previews: 'Forskoðun orðaforðamynda', language: 'Tungumál',
+    handoff: 'Afritaðu fyrirmælin og límdu þau inn í ChatGPT, Gemini eða aðra myndagerðargervigreind. Búðu til myndina þar og afritaðu hana síðan aftur hingað.',
+    promptHint: 'Sláðu inn orð eða hugtök til að sjá fyrirmælin.',
+    copy: 'Afrita fyrirmæli',
+    sheet: 'Myndablað',
+    sheetHint: 'Límdu inn eða veldu myndablað sem passar nákvæmlega við reitaskiptinguna. Myndirnar haldast í þessum vafra. Ef orðalistanum er breytt er myndablaðið skorið aftur samkvæmt nýju reitaskiptingunni.',
+    paste: 'Líma inn myndablað',
+    pasteHint: 'Afritaðu myndina, smelltu hér og ýttu á ⌘V á Mac eða Ctrl+V á Windows. Þú getur líka límt mynd inn hvar sem er á síðunni.',
+    alternative: 'Eða veldu myndaskrá',
+    choose: 'Velja mynd',
+    zoom: 'Aðdráttur',
+    previews: 'Forskoðun orðaforðamynda',
+    language: 'Tungumál',
     count: n => `Fjöldi orða og hugtaka: ${n}`,
     grid: size => `Tillaga að reitaskiptingu: ${size} (raðir × dálkar)`,
-    copied: 'Fyrirmæli afrituð.', copyFallback: 'Ekki tókst að afrita. Fyrirmælin eru valin — ýttu á Ctrl+C eða ⌘C til að afrita.',
-    loading: 'Hleð mynd…', ready: 'Myndin er tilbúin. Sláðu inn orð eða hugtök til að forskoða myndskurðinn.',
+    copied: 'Fyrirmæli afrituð.',
+    copyFallback: 'Ekki tókst að afrita. Fyrirmælin eru valin — ýttu á Ctrl+C eða ⌘C til að afrita.',
+    loading: 'Hleð mynd…',
+    ready: 'Myndin er tilbúin. Sláðu inn orð eða hugtök til að forskoða myndskurðinn.',
     empty: 'Sláðu inn orð eða hugtök og límdu inn eða veldu mynd til að forskoða myndskurðinn.',
     readError: 'Ekki tókst að lesa myndina. Veldu mynd á studdu sniði, til dæmis PNG eða JPEG.',
     sliceError: 'Ekki tókst að skera myndina. Prófaðu minni mynd eða annað snið.',
     cropLabel: item => `Útskorin mynd fyrir ${item}`,
     sliceSummary: (n, rows, columns, unused) => `Forskoðun: ${n} myndir · ${rows} × ${columns} reitir (raðir × dálkar)` + (unused ? ` · Auðir reitir sem sleppt er: ${unused}.` : '.'),
     cell: (i, row, column, item) => `${i}. Röð ${row}, dálkur ${column}: ${JSON.stringify(item)}`,
+    imageCopied: 'Mynd afrituð á klemmuspjald.',
+    imageCopyError: 'Ekki tókst að afrita myndina.',
+    clickToCopy: 'Smelltu til að afrita mynd á klemmuspjald',
     promptText: (rows, columns, concepts, unused) => `Búðu til eitt myndablað með nákvæmlega ${rows} röðum og ${columns} dálkum (alls ${rows * columns} reitir).
 
 Notaðu reglulega, rétthyrnda reitaskiptingu með jafnstórum ferningslaga reitum. Hlutfall breiddar og hæðar myndarinnar skal vera ${columns}:${rows}. Láttu allar raðir og dálka standast nákvæmlega á, án bila, ytri spássía, sameinaðra reita eða skörunar. Hafðu sama hvíta bakgrunn í öllum reitum og hvert myndefni fyrir miðju, með jöfnu svigrúmi í kring og að öllu leyti innan reitsins.
@@ -31,20 +47,39 @@ ${unused > 0 ? `Fjöldi ónotaðra reita: ${unused}. Skildu alla ónotaða reiti
   },
   en: {
     generate: 'Generate prompt',
-    subtitle: 'Create images for your vocabulary list with the help of AI.', vocabulary: 'Vocabulary concepts', hint: 'Enter one item per line.',
-    example: 'apple\nred bicycle\nmountain', parsed: 'Parsed vocabulary items',
-    prompt: 'Contact-sheet prompt', handoff: 'Copy the prompt into ChatGPT, Gemini, or another image generator. Generate the image there, then copy the finished image back here.', promptHint: 'Add vocabulary items to see the prompt.', copy: 'Copy prompt',
-    sheet: 'Contact-sheet image', sheetHint: 'Paste or choose a sheet matching the current grid exactly. Images stay in this browser. Editing vocabulary re-slices the sheet using the updated grid.',
-    paste: 'Paste a contact-sheet image', pasteHint: 'Copy the image, click here, then press ⌘V on Mac or Ctrl+V on Windows. You can also paste an image anywhere on this page.',
-    alternative: 'Or choose an image file', choose: 'Choose image', zoom: 'Zoom', previews: 'Vocabulary image previews', language: 'Language',
+    subtitle: 'Create images for your vocabulary list with the help of AI.',
+    vocabulary: 'Vocabulary concepts',
+    hint: 'Enter one item per line.',
+    example: 'apple\nred bicycle\nmountain',
+    parsed: 'Parsed vocabulary items',
+    prompt: 'Contact-sheet prompt',
+    handoff: 'Copy the prompt into ChatGPT, Gemini, or another image generator. Generate the image there, then copy the finished image back here.',
+    promptHint: 'Add vocabulary items to see the prompt.',
+    copy: 'Copy prompt',
+    sheet: 'Contact-sheet image',
+    sheetHint: 'Paste or choose a sheet matching the current grid exactly. Images stay in this browser. Editing vocabulary re-slices the sheet using the updated grid.',
+    paste: 'Paste a contact-sheet image',
+    pasteHint: 'Copy the image, click here, then press ⌘V on Mac or Ctrl+V on Windows. You can also paste an image anywhere on this page.',
+    alternative: 'Or choose an image file',
+    choose: 'Choose image',
+    zoom: 'Zoom',
+    previews: 'Vocabulary image previews',
+    language: 'Language',
     count: n => `${n} vocabulary ${n === 1 ? 'item' : 'items'}`,
     grid: size => `Proposed grid: ${size} (rows × columns)`,
-    copied: 'Prompt copied.', copyFallback: 'Copy unavailable. Prompt selected — press Ctrl+C or ⌘C to copy.',
-    loading: 'Loading image…', ready: 'Image ready. Add vocabulary items to preview slices.', empty: 'Add vocabulary items and paste or choose an image to preview slices.',
-    readError: 'Could not read this image. Choose a supported image such as PNG or JPEG.', sliceError: 'Could not slice this image. Try a smaller image or another format.',
+    copied: 'Prompt copied.',
+    copyFallback: 'Copy unavailable. Prompt selected — press Ctrl+C or ⌘C to copy.',
+    loading: 'Loading image…',
+    ready: 'Image ready. Add vocabulary items to preview slices.',
+    empty: 'Add vocabulary items and paste or choose an image to preview slices.',
+    readError: 'Could not read this image. Choose a supported image such as PNG or JPEG.',
+    sliceError: 'Could not slice this image. Try a smaller image or another format.',
     cropLabel: item => `Cropped image for ${item}`,
     sliceSummary: (n, rows, columns, unused) => `${n} previews · ${rows} × ${columns} grid (rows × columns)` + (unused ? ` · ${unused} unused ${unused === 1 ? 'cell' : 'cells'} ignored.` : '.'),
     cell: (i, row, column, item) => `${i}. Row ${row}, column ${column}: ${JSON.stringify(item)}`,
+    imageCopied: 'Image copied to clipboard.',
+    imageCopyError: 'Could not copy image to clipboard.',
+    clickToCopy: 'Click to copy image to clipboard',
     promptText: (rows, columns, concepts, unused) => `Create a single contact-sheet image containing exactly ${rows} rows and ${columns} columns (${rows * columns} cells total).
 
 Use a regular rectangular grid of equally sized square cells. Match the overall image width-to-height ratio to ${columns}:${rows}. Align every row and column precisely, with no gaps, outer margins, merged cells, or overlapping content. Use identical plain white backgrounds and keep each concept centered with consistent padding entirely inside its cell.
@@ -55,15 +90,17 @@ Concepts in cell order:
 ${concepts}
 
 ${unused > 0
-    ? `Leave the final ${unused} unused ${unused === 1 ? 'cell' : 'cells'} completely blank white, after the last concept in left-to-right, top-to-bottom order. Preserve their full cell geometry. Do not repeat concepts or invent fillers.`
+    ? `Leave the final ${unused} unused${unused === 1 ? 'cell' : 'cells'} completely blank white, after the last concept in left-to-right, top-to-bottom order. Preserve their full cell geometry. Do not repeat concepts or invent fillers.`
     : 'Every cell is assigned a concept; leave no unused cells.'}`
   }
 };
+
 let language = 'is';
 try {
   const saved = localStorage.getItem('myndakista-language');
   if (saved === 'is' || saved === 'en') language = saved;
 } catch { /* Language switching still works if browser storage is unavailable. */ }
+
 let copyMessage = '';
 const t = () => translations[language];
 
@@ -92,6 +129,7 @@ const sliceStatus = document.querySelector('#slice-status');
 const slicePreviews = document.querySelector('#slice-previews');
 const cropInset = document.querySelector('#crop-inset');
 const cropInsetValue = document.querySelector('#crop-inset-value');
+
 let sheetImage = null;
 let imageSelection = 0;
 let sheetLoading = false;
@@ -105,8 +143,6 @@ function getGrid(count) {
 }
 
 function resizeVocabularyInput() {
-  // Re-measure wrapped lines after edits or viewport changes. Manual resizing
-  // remains available until the next content or viewport change.
   vocabularyInput.style.height = 'auto';
   const styles = getComputedStyle(vocabularyInput);
   const borders = parseFloat(styles.borderTopWidth) + parseFloat(styles.borderBottomWidth);
@@ -156,7 +192,6 @@ function generatePrompt() {
   promptOutput.value = t().promptText(rows, columns, concepts, unused);
 }
 
-
 async function copyPrompt() {
   const text = promptOutput.value;
   if (!text) return;
@@ -184,7 +219,6 @@ generateButton.addEventListener('click', () => {
 
 copyButton.addEventListener('click', copyPrompt);
 
-// Support the selected-text keyboard copy fallback when clipboard writing is unavailable.
 promptOutput.addEventListener('copy', (event) => {
   if (!event.clipboardData || !promptOutput.value ||
       promptOutput.selectionStart !== 0 ||
@@ -195,6 +229,33 @@ promptOutput.addEventListener('copy', (event) => {
   copyStatus.textContent = t().copied;
   revealStep(imageStep);
 });
+
+async function copyCanvasToClipboard(canvas, feedbackElement) {
+  try {
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) throw new Error('Blob creation failed');
+
+    await navigator.clipboard.write([
+      new ClipboardItem({ 'image/png': blob })
+    ]);
+
+    if (feedbackElement) {
+      feedbackElement.textContent = t().imageCopied;
+      clearTimeout(feedbackElement._timeout);
+      feedbackElement._timeout = setTimeout(() => {
+        feedbackElement.textContent = '';
+      }, 2500);
+    }
+  } catch {
+    if (feedbackElement) {
+      feedbackElement.textContent = t().imageCopyError;
+      clearTimeout(feedbackElement._timeout);
+      feedbackElement._timeout = setTimeout(() => {
+        feedbackElement.textContent = '';
+      }, 3000);
+    }
+  }
+}
 
 function renderSlices() {
   slicePreviews.replaceChildren();
@@ -226,11 +287,15 @@ function renderSlices() {
       const canvas = document.createElement('canvas');
       canvas.width = Math.max(1, Math.round(cellWidth));
       canvas.height = Math.max(1, Math.round(cellHeight));
-      canvas.setAttribute('role', 'img');
-      canvas.setAttribute('aria-label', t().cropLabel(item));
+      canvas.setAttribute('role', 'button');
+      canvas.setAttribute('aria-label', `${t().cropLabel(item)}. ${t().clickToCopy}`);
+      canvas.tabIndex = 0;
+      canvas.style.cursor = 'pointer';
+      canvas.title = t().clickToCopy;
+
       const context = canvas.getContext('2d');
       if (!context) throw new Error('Canvas unavailable');
-      // Apply the same percentage to each side of its cell dimension.
+
       context.drawImage(
         sheetImage,
         (index % columns) * cellWidth + insetX,
@@ -238,12 +303,29 @@ function renderSlices() {
         cellWidth - 2 * insetX, cellHeight - 2 * insetY,
         0, 0, canvas.width, canvas.height
       );
+
       const preview = document.createElement('li');
       const label = document.createElement('span');
       label.textContent = `${index + 1}. ${item}`;
-      preview.append(canvas, label);
+
+      const feedback = document.createElement('span');
+      feedback.className = 'item-copy-status';
+      feedback.setAttribute('aria-live', 'polite');
+
+      const handleCopy = () => copyCanvasToClipboard(canvas, feedback);
+
+      canvas.addEventListener('click', handleCopy);
+      canvas.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleCopy();
+        }
+      });
+
+      preview.append(canvas, label, feedback);
       previews.append(preview);
     });
+
     slicePreviews.append(previews);
     const unused = rows * columns - items.length;
     sliceStatus.textContent = t().sliceSummary(items.length, rows, columns, unused);
@@ -262,7 +344,6 @@ async function loadSheet(file) {
   if (!file) return;
 
   try {
-    // Decode the local file directly; no network request or stored copy is needed.
     const image = await createImageBitmap(file);
     if (selection !== imageSelection) {
       image.close();
@@ -276,7 +357,6 @@ async function loadSheet(file) {
   sheetLoading = false;
   renderSlices();
   if (sheetImage) {
-    // Also keep the input available when an image is pasted directly onto the page.
     imageStep.hidden = false;
     revealStep(resultsStep);
   }
@@ -298,7 +378,6 @@ document.addEventListener('paste', (event) => {
   const file = imageItem?.getAsFile();
   if (!file) return;
 
-  // Leave ordinary text pastes untouched; images use the file picker's path.
   event.preventDefault();
   sheetInput.value = '';
   loadSheet(file);
@@ -321,14 +400,23 @@ function applyLanguage() {
   document.documentElement.lang = language;
   const labels = {
     '#app-subtitle': 'subtitle',
-    '#generate-prompt': 'generate', '#vocabulary-label': 'vocabulary', '#vocabulary-hint': 'hint',
-    '#prompt-handoff': 'handoff', '#prompt-label': 'prompt', '#copy-prompt': 'copy',
-    '#sheet-label': 'sheet', '#sheet-hint': 'sheetHint', '#sheet-paste strong': 'paste',
-    '#paste-hint': 'pasteHint', 'label[for="sheet-input"]:not(#sheet-label)': 'alternative',
-    '#choose-sheet': 'choose', 'label[for="crop-inset"]': 'zoom'
+    '#generate-prompt': 'generate',
+    '#vocabulary-label': 'vocabulary',
+    '#vocabulary-hint': 'hint',
+    '#prompt-handoff': 'handoff',
+    '#prompt-label': 'prompt',
+    '#copy-prompt': 'copy',
+    '#sheet-label': 'sheet',
+    '#sheet-hint': 'sheetHint',
+    '#sheet-paste strong': 'paste',
+    '#paste-hint': 'pasteHint',
+    'label[for="sheet-input"]:not(#sheet-label)': 'alternative',
+    '#choose-sheet': 'choose',
+    'label[for="crop-inset"]': 'zoom'
   };
   for (const [selector, key] of Object.entries(labels)) {
-    document.querySelector(selector).textContent = t()[key];
+    const el = document.querySelector(selector);
+    if (el) el.textContent = t()[key];
   }
   vocabularyInput.placeholder = t().example;
   promptOutput.placeholder = t().promptHint;
