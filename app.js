@@ -10,6 +10,8 @@ const copyStatus = document.querySelector('#copy-status');
 const sheetInput = document.querySelector('#sheet-input');
 const sliceStatus = document.querySelector('#slice-status');
 const slicePreviews = document.querySelector('#slice-previews');
+const cropInset = document.querySelector('#crop-inset');
+const cropInsetValue = document.querySelector('#crop-inset-value');
 let sheetImage = null;
 let imageSelection = 0;
 let sheetLoading = false;
@@ -114,6 +116,9 @@ function renderSlices() {
   const { rows, columns } = getGrid(items.length);
   const cellWidth = sheetImage.width / columns;
   const cellHeight = sheetImage.height / rows;
+  const insetRatio = Number(cropInset.value) / 100;
+  const insetX = cellWidth * insetRatio;
+  const insetY = cellHeight * insetRatio;
   const previews = document.createDocumentFragment();
 
   try {
@@ -125,12 +130,12 @@ function renderSlices() {
       canvas.setAttribute('aria-label', `Cropped image for ${item}`);
       const context = canvas.getContext('2d');
       if (!context) throw new Error('Canvas unavailable');
-      // Fractional source coordinates divide the full sheet into equal cells.
+      // Apply the same percentage to each side of its cell dimension.
       context.drawImage(
         sheetImage,
-        (index % columns) * cellWidth,
-        Math.floor(index / columns) * cellHeight,
-        cellWidth, cellHeight,
+        (index % columns) * cellWidth + insetX,
+        Math.floor(index / columns) * cellHeight + insetY,
+        cellWidth - 2 * insetX, cellHeight - 2 * insetY,
         0, 0, canvas.width, canvas.height
       );
       const preview = document.createElement('li');
@@ -193,4 +198,11 @@ document.addEventListener('paste', (event) => {
   event.preventDefault();
   sheetInput.value = '';
   loadSheet(file);
+});
+
+cropInset.addEventListener('input', () => {
+  const percentage = `${Number(cropInset.value)}%`;
+  cropInsetValue.textContent = percentage;
+  cropInset.setAttribute('aria-valuetext', percentage);
+  renderSlices();
 });

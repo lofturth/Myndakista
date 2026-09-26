@@ -193,3 +193,23 @@ button:disabled {
   outline-offset: 2px;
   border-color: #2563eb;
 }
+
+.crop-inset-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  font-size: 0.875rem;
+}
+
+#crop-inset {
+  flex: 1;
+  min-width: 0;
+  max-width: 200px;
+  margin: 0;
+}
+
+#crop-inset-value {
+  min-width: 3.5ch;
+  font-variant-numeric: tabular-nums;
+}

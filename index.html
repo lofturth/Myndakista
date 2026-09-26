@@ -36,6 +36,11 @@
       <label for="sheet-input">Or choose an image file</label>
       <input id="sheet-input" type="file" accept="image/*" aria-describedby="sheet-hint">
       <p id="slice-status" role="status" aria-live="polite">Add vocabulary items and paste or choose an image to preview slices.</p>
+      <div class="crop-inset-control">
+        <label for="crop-inset">Zoom</label>
+        <input id="crop-inset" type="range" min="0" max="20" step="0.1" value="0" aria-valuetext="0%">
+        <output id="crop-inset-value" for="crop-inset">0%</output>
+      </div>
       <ol id="slice-previews" aria-label="Vocabulary image previews"></ol>
     </section>
   </main>
