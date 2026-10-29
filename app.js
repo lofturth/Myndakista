@@ -34,6 +34,10 @@ const translations = {
     imageCopied: 'Mynd afrituð á klemmuspjald.',
     imageCopyError: 'Ekki tókst að afrita myndina.',
     clickToCopy: 'Smelltu til að afrita mynd á klemmuspjald',
+    downloadAll: 'Hlaða niður öllum myndum',
+    downloadOne: item => `Hlaða niður mynd fyrir ${item}`,
+    downloadError: 'Ekki tókst að hlaða niður myndinni. Reyndu aftur.',
+    zipError: 'Ekki tókst að búa til ZIP-skrá. Reyndu aftur eða hlaða niður myndunum einni í einu.',
     promptText: (rows, columns, concepts, unused) => `Búðu til eitt myndablað með nákvæmlega ${rows} röðum og ${columns} dálkum (alls ${rows * columns} reitir).
 
 Notaðu reglulega, rétthyrnda reitaskiptingu með jafnstórum ferningslaga reitum. Hlutfall breiddar og hæðar myndarinnar skal vera ${columns}:${rows}. Láttu allar raðir og dálka standast nákvæmlega á, án bila, ytri spássía, sameinaðra reita eða skörunar. Hafðu sama hvíta bakgrunn í öllum reitum og hvert myndefni fyrir miðju, með jöfnu svigrúmi í kring og að öllu leyti innan reitsins.
@@ -80,6 +84,10 @@ ${unused > 0 ? `Fjöldi ónotaðra reita: ${unused}. Skildu alla ónotaða reiti
     imageCopied: 'Image copied to clipboard.',
     imageCopyError: 'Could not copy image to clipboard.',
     clickToCopy: 'Click to copy image to clipboard',
+    downloadAll: 'Download all images',
+    downloadOne: item => `Download image for ${item}`,
+    downloadError: 'Could not download this image. Please try again.',
+    zipError: 'Could not create the ZIP file. Please try again or download images individually.',
     promptText: (rows, columns, concepts, unused) => `Create a single contact-sheet image containing exactly ${rows} rows and ${columns} columns (${rows * columns} cells total).
 
 Use a regular rectangular grid of equally sized square cells. Match the overall image width-to-height ratio to ${columns}:${rows}. Align every row and column precisely, with no gaps, outer margins, merged cells, or overlapping content. Use identical plain white backgrounds and keep each concept centered with consistent padding entirely inside its cell.
@@ -129,12 +137,145 @@ const sliceStatus = document.querySelector('#slice-status');
 const slicePreviews = document.querySelector('#slice-previews');
 const cropInset = document.querySelector('#crop-inset');
 const cropInsetValue = document.querySelector('#crop-inset-value');
+const downloadAllButton = document.querySelector('#download-all');
+const downloadStatus = document.querySelector('#download-status');
 
 let sheetImage = null;
 let imageSelection = 0;
 let sheetLoading = false;
 let sheetError = '';
 let items = [];
+let exportNames = [];
+
+function safeName(item) {
+  const name = item.normalize('NFC').replace(/[\\/<>:"|?*\x00-\x1f\x7f]/g, '-')
+    .replace(/\s+/g, ' ').replace(/^[. -]+|[. -]+$/g, '').slice(0, 80)
+    .replace(/[. -]+$/g, '');
+  return !name || /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i.test(name) ? `image-${name || 'untitled'}` : name;
+}
+
+function filenames(concepts) {
+  const counts = new Map();
+  const width = Math.max(2, String(concepts.length).length);
+  return concepts.map((item, index) => {
+    const base = safeName(item);
+    const key = base.toLocaleLowerCase();
+    const count = (counts.get(key) || 0) + 1;
+    counts.set(key, count);
+    return `${String(index + 1).padStart(width, '0')}-${base}${count > 1 ? `-${count}` : ''}.png`;
+  });
+}
+
+function canvasPng(canvas) {
+  return new Promise((resolve, reject) => canvas.toBlob(blob => {
+    if (blob) resolve(blob);
+    else reject(new Error('PNG encoding failed'));
+  }, 'image/png'));
+}
+
+function saveBlob(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = name;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
+// ZIP with stored PNG entries. PNGs are already compressed, so ZIP compression adds little.
+function zipPngs(files) {
+  const encoder = new TextEncoder();
+  const chunks = [];
+  const directory = [];
+  let offset = 0;
+  const crcTable = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let bit = 0; bit < 8; bit++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    crcTable[n] = c >>> 0;
+  }
+  const crc32 = bytes => {
+    let crc = 0xffffffff;
+    for (const byte of bytes) crc = crcTable[(crc ^ byte) & 255] ^ (crc >>> 8);
+    return (crc ^ 0xffffffff) >>> 0;
+  };
+  if (files.length > 65535) throw new Error('Too many ZIP entries');
+  for (const { name, bytes } of files) {
+    const filename = encoder.encode(name);
+    if (filename.length > 65535 || bytes.length > 0xffffffff || offset > 0xffffffff) throw new Error('ZIP size limit');
+    const header = new Uint8Array(30 + filename.length);
+    const view = new DataView(header.buffer);
+    view.setUint32(0, 0x04034b50, true);
+    view.setUint16(4, 20, true);
+    view.setUint16(6, 0x0800, true); // UTF-8 names
+    view.setUint16(8, 0, true); // Stored
+    view.setUint32(14, crc32(bytes), true);
+    view.setUint32(18, bytes.length, true);
+    view.setUint32(22, bytes.length, true);
+    view.setUint16(26, filename.length, true);
+    header.set(filename, 30);
+    chunks.push(header, bytes);
+    directory.push({ filename, crc: view.getUint32(14, true), size: bytes.length, offset });
+    offset += header.length + bytes.length;
+  }
+  const directoryOffset = offset;
+  for (const entry of directory) {
+    const header = new Uint8Array(46 + entry.filename.length);
+    const view = new DataView(header.buffer);
+    view.setUint32(0, 0x02014b50, true);
+    view.setUint16(4, 20, true);
+    view.setUint16(6, 20, true);
+    view.setUint16(8, 0x0800, true);
+    view.setUint32(16, entry.crc, true);
+    view.setUint32(20, entry.size, true);
+    view.setUint32(24, entry.size, true);
+    view.setUint16(28, entry.filename.length, true);
+    view.setUint32(42, entry.offset, true);
+    header.set(entry.filename, 46);
+    chunks.push(header);
+    offset += header.length;
+  }
+  if (offset > 0xffffffff) throw new Error('ZIP size limit');
+  const end = new Uint8Array(22);
+  const view = new DataView(end.buffer);
+  view.setUint32(0, 0x06054b50, true);
+  view.setUint16(8, files.length, true);
+  view.setUint16(10, files.length, true);
+  view.setUint32(12, offset - directoryOffset, true);
+  view.setUint32(16, directoryOffset, true);
+  chunks.push(end);
+  return new Blob(chunks, { type: 'application/zip' });
+}
+
+async function downloadCanvas(canvas, name, feedback) {
+  try {
+    saveBlob(await canvasPng(canvas), name);
+    feedback.textContent = '';
+  } catch {
+    feedback.textContent = t().downloadError;
+  }
+}
+
+downloadAllButton.addEventListener('click', async () => {
+  const canvases = [...slicePreviews.querySelectorAll('canvas')];
+  const names = [...exportNames];
+  if (!canvases.length || canvases.length !== names.length) return;
+  downloadAllButton.disabled = true;
+  downloadStatus.textContent = '';
+  try {
+    const files = [];
+    for (let i = 0; i < canvases.length; i++) {
+      files.push({ name: names[i], bytes: new Uint8Array(await (await canvasPng(canvases[i])).arrayBuffer()) });
+    }
+    saveBlob(zipPngs(files), 'myndakista-images.zip');
+  } catch {
+    downloadStatus.textContent = t().zipError;
+  } finally {
+    downloadAllButton.disabled = !slicePreviews.querySelector('canvas');
+  }
+});
 
 function getGrid(count) {
   if (count === 0) return { rows: 0, columns: 0 };
@@ -259,6 +400,9 @@ async function copyCanvasToClipboard(canvas, feedbackElement) {
 
 function renderSlices() {
   slicePreviews.replaceChildren();
+  exportNames = [];
+  downloadAllButton.disabled = true;
+  downloadStatus.textContent = '';
   if (sheetLoading) {
     sliceStatus.textContent = t().loading;
     return;
@@ -281,6 +425,7 @@ function renderSlices() {
   const insetX = cellWidth * insetRatio;
   const insetY = cellHeight * insetRatio;
   const previews = document.createDocumentFragment();
+  const names = filenames(items);
 
   try {
     items.forEach((item, index) => {
@@ -312,6 +457,14 @@ function renderSlices() {
       feedback.className = 'item-copy-status';
       feedback.setAttribute('aria-live', 'polite');
 
+      const download = document.createElement('button');
+      download.type = 'button';
+      download.className = 'item-download';
+      download.textContent = '↓';
+      download.setAttribute('aria-label', t().downloadOne(item));
+      download.title = t().downloadOne(item);
+      download.addEventListener('click', () => downloadCanvas(canvas, names[index], feedback));
+
       const handleCopy = () => copyCanvasToClipboard(canvas, feedback);
 
       canvas.addEventListener('click', handleCopy);
@@ -322,11 +475,13 @@ function renderSlices() {
         }
       });
 
-      preview.append(canvas, label, feedback);
+      preview.append(canvas, label, download, feedback);
       previews.append(preview);
     });
 
     slicePreviews.append(previews);
+    exportNames = names;
+    downloadAllButton.disabled = false;
     const unused = rows * columns - items.length;
     sliceStatus.textContent = t().sliceSummary(items.length, rows, columns, unused);
   } catch {
@@ -412,6 +567,7 @@ function applyLanguage() {
     '#paste-hint': 'pasteHint',
     'label[for="sheet-input"]:not(#sheet-label)': 'alternative',
     '#choose-sheet': 'choose',
+    '#download-all': 'downloadAll',
     'label[for="crop-inset"]': 'zoom'
   };
   for (const [selector, key] of Object.entries(labels)) {

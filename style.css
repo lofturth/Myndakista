@@ -597,6 +597,36 @@ textarea::placeholder {
   font-weight: 600;
 }
 
+.download-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 16px;
+}
+
+.download-actions p {
+  font-size: 0.875rem;
+}
+
+#slice-previews .item-download {
+  float: right;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 2px 8px;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+#slice-previews li > span:not(.item-copy-status) {
+  display: inline;
+}
+
+#slice-previews .item-copy-status {
+  clear: both;
+  font-weight: 400;
+}
+
 @media (min-width: 800px) {
   .vocabulary {
     column-gap: 24px;
